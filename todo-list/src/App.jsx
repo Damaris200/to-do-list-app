@@ -62,7 +62,7 @@ const App = () => {
         {/* Left Section */}
         <div className="left-section">
           <div className="frame">
-            <h3 className="section-title">List of Cleaning Tasks</h3>
+            <h2 className="section-title">List of Tasks</h2>
             <div className="task-list">
               {tasks.map((task) => (
                 <div key={task.id} className="task-item">
