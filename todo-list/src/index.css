@@ -1,0 +1,70 @@
+@import "/node_modules/@fortawesome/fontawesome-free/css/all.min.css";
+:root {
+    font-family: "Inter", sans-serif;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(to bottom, #e0e7ff, #f8fafc);
+}
+
+.app {
+    text-align: center;
+    padding: 20px;
+}
+
+.content {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.left,
+.right {
+    flex: 1;
+}
+
+.task-list,
+.add-task,
+.progress {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.progress-bar {
+    background: #e5e7eb;
+    height: 10px;
+    border-radius: 5px;
+    margin: 10px 0;
+}
+
+.progress-fill {
+    background: #ed55a1;
+    height: 100%;
+    border-radius: 5px;
+}
+
+.footer {
+    display: flex;
+    justify-content: space-around;
+    padding: 20px;
+    background: #f1f5f9;
+    border-radius: 10px;
+    margin-top: 20px;
+}
+
+button {
+    background: #f63b86;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #c82171;
+}
