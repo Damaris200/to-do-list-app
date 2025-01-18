@@ -2,18 +2,21 @@ import React, { useState } from "react";
 
 function AddTask({ addTask }) {
   const [taskText, setTaskText] = useState("");
-  const [category, setCategory] = useState("");
+  const [category, setCategory] = useState("health"); // Default category set to 'health'
 
   const handleAdd = () => {
     if (taskText.trim() && category.trim()) {
-      addTask({
+      const newTask = {
         id: Date.now(),
         text: taskText,
         completed: false,
         category,
-      });
-      setTaskText("");
-      setCategory("");
+      };
+      addTask(newTask);
+      setTaskText(""); // Reset task text
+      setCategory("health"); // Reset category to default
+    } else {
+      alert("Please enter a task name and select a category.");
     }
   };
 
@@ -26,12 +29,13 @@ function AddTask({ addTask }) {
         value={taskText}
         onChange={(e) => setTaskText(e.target.value)}
       />
-      <input
-        type="text"
-        placeholder="Category"
-        value={category}
-        onChange={(e) => setCategory(e.target.value)}
-      />
+      <select value={category} onChange={(e) => setCategory(e.target.value)}>
+        <option value="">Select Category</option> {/* Placeholder */}
+        <option value="health">Health</option>
+        <option value="errands">Errands</option>
+        <option value="learning">Learning</option>
+        <option value="cleaning">Cleaning</option>
+      </select>
       <button onClick={handleAdd}>Add</button>
     </div>
   );

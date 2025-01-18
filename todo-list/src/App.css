@@ -30,8 +30,13 @@
 
 .section-title {
     font-size: 1.2rem;
-    font-weight: bold;
+    /* font-weight: bold; */
     margin-bottom: 10px;
+}
+
+section-wrapper {
+    display: flex;
+    flex-direction: row;
 }
 
 .task-list {

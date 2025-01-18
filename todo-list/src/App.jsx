@@ -1,4 +1,11 @@
-import React, { useState } from "react";
+import React, {
+  useState,
+  useRef,
+  useMemo,
+  useCallback,
+  useEffect,
+} from "react";
+import AddTask from "./components/AddTask";
 
 const App = () => {
   const [tasks, setTasks] = useState([
@@ -11,58 +18,95 @@ const App = () => {
   const [category, setCategory] = useState("");
   const [showOptions, setShowOptions] = useState("");
 
-  const addTask = () => {
-    if (taskName.trim() && category.trim()) {
-      setTasks([
-        ...tasks,
-        { id: tasks.length + 1, task: taskName.trim(), completed: false },
-      ]);
-      setTaskName("");
-      setCategory("");
-    }
-  };
+  const inputRef = useRef(null); // Ref for task input
 
-  const deleteTask = (id) => {
-    setTasks(tasks.filter((task) => task.id !== id));
-  };
+  // Automatically focus the task input field
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, [taskName]);
 
-  const editTask = (id) => {
-    const task = tasks.find((task) => task.id === id);
-    if (task) {
-      setTaskName(task.task);
-      setCategory(""); // Reset category
-    }
-  };
+  // Log task changes for debugging
+  useEffect(() => {
+    console.log("Tasks updated:", tasks);
+  }, [tasks]);
 
-  const toggleCompletion = (id) => {
-    const updatedTasks = tasks.map((task) =>
-      task.id === id ? { ...task, completed: !task.completed } : task
+  const addTask = useCallback(
+    (task) => {
+      const taskName = task.taskName;
+      const category = task.category;
+      if (taskName && category) {
+        setTasks((prevTasks) => [
+          ...prevTasks,
+          { id: prevTasks.length + 1, task: taskName.trim(), completed: false, category },
+        ]);
+      } else {
+        alert("Please provide a valid task name and category.");
+      }
+    },
+    [] 
+  );
+
+  const deleteTask = useCallback((id) => {
+    setTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
+  }, []);
+
+  const editTask = useCallback(
+    (id) => {
+      const task = tasks.find((task) => task.id === id);
+      if (task) {
+        setTaskName(task.task);
+        setCategory(""); // Reset category
+      }
+    },
+    [tasks]
+  );
+
+  const toggleCompletion = useCallback((id) => {
+    setTasks((prevTasks) =>
+      prevTasks.map((task) =>
+        task.id === id ? { ...task, completed: !task.completed } : task
+      )
     );
-    setTasks(updatedTasks);
-  };
+  }, []);
 
-  const completedTasks = tasks.filter((task) => task.completed).length;
-  const totalTasks = tasks.length;
-  const progressPercentage =
-    totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+  // Memoized progress calculations
+  const completedTasks = useMemo(
+    () => tasks.filter((task) => task.completed).length,
+    [tasks]
+  );
+  const totalTasks = useMemo(() => tasks.length, [tasks]);
+  const progressPercentage = useMemo(
+    () => (totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0),
+    [completedTasks, totalTasks]
+  );
 
-  const handleCategoryClick = (category) => {
+  const handleCategoryClick = useCallback((category) => {
     setShowOptions(category);
-  };
+  }, []);
 
-  const handleOptionSelect = (option) => {
-    alert(`You selected ${option} for ${showOptions}!`);
-    setShowOptions(""); // Hide options after selection
-  };
+  const handleOptionSelect = useCallback(
+    (option) => {
+      alert(`You selected ${option} for ${showOptions}!`);
+      setShowOptions(""); // Hide options after selection
+    },
+    [showOptions]
+  );
 
   return (
     <div className="container">
-      <h1 className="title">Simple TodoList</h1>
+      <h1 className="title">My Todo List App</h1>
       <div className="main">
         {/* Left Section */}
         <div className="left-section">
           <div className="frame">
-            <h2 className="section-title">List of Tasks</h2>
+            <div className="section-wrapper">
+              <h2 className="section-title">List of tasks</h2>
+              <input
+                type="search"
+                name="search-tasks"
+                placeholder="Search Tasks"
+              />
+            </div>
             <div className="task-list">
               {tasks.map((task) => (
                 <div key={task.id} className="task-item">
@@ -77,33 +121,13 @@ const App = () => {
                     className="icon edit-icon"
                     onClick={() => editTask(task.id)}
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="20"
-                      height="20"
-                      fill="blue"
-                      viewBox="0 0 16 16"
-                    >
-                      <path d="M15.502 1.94a1.5 1.5 0 0 1 0 2.12l-9.66 9.658a.5.5 0 0 1-.168.11l-4 1.5a.5.5 0 0 1-.65-.65l1.5-4a.5.5 0 0 1 .11-.168l9.658-9.66a1.5 1.5 0 0 1 2.12 0zM12.854 3L3 12.854V14h1.146L14 3.146 12.854 3z" />
-                    </svg>
+                    ✎
                   </span>
                   <span
                     className="icon trash-icon"
                     onClick={() => deleteTask(task.id)}
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="20"
-                      height="20"
-                      fill="red"
-                      viewBox="0 0 16 16"
-                    >
-                      <path d="M5.5 5.5A.5.5 0 0 1 6 6v7a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5.5a.5.5 0 0 0-1 0v7a.5.5 0 0 0 1 0V6zM10 5.5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5z" />
-                      <path
-                        fillRule="evenodd"
-                        d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 1 1 0-2h4a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5h4a1 1 0 0 1 1 1zM12 4H4v9a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4z"
-                      />
-                    </svg>
+                    🗑
                   </span>
                 </div>
               ))}
@@ -121,123 +145,34 @@ const App = () => {
                   style={{ width: `${progressPercentage}%` }}
                 ></div>
               </div>
+              <p>{progressPercentage.toFixed(2)}% Completed</p>
             </div>
           </div>
           <div className="frame">
-            <h3 className="section-title">Add New Task</h3>
-            <input
-              type="text"
-              placeholder="Task Name"
-              value={taskName}
-              onChange={(e) => setTaskName(e.target.value)}
-              className="input"
-            />
-            <input
-              type="text"
-              placeholder="Category"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="input"
-            />
-            <button onClick={addTask} className="add-button">
-              Add
-            </button>
+            <AddTask addTask={addTask} />
           </div>
         </div>
       </div>
+      {/* Footer with Categories */}
       <div className="footer">
-        <button
-          className="footer-button"
-          onClick={() => handleCategoryClick("Cleaning")}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            fill="currentColor"
-            viewBox="0 0 16 16"
+        {["Cleaning", "Errands", "Learning", "Health"].map((cat) => (
+          <button
+            key={cat}
+            className="footer-button"
+            onClick={() => handleCategoryClick(cat)}
           >
-            <path d="M1.5 1.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 .5.5v1h-12v-1zm12 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V3h10zM2 4v10a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V4H2z" />
-          </svg>
-          Cleaning
-        </button>
-        <button
-          className="footer-button"
-          onClick={() => handleCategoryClick("Errands")}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            fill="currentColor"
-            viewBox="0 0 16 16"
-          >
-            <path d="M8.5 1.5a.5.5 0 0 1 .5.5v1h-1v-1a.5.5 0 0 1 .5-.5zM8 3h-2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-6zm5 10H3V6h10v7z" />
-          </svg>
-          Errands
-        </button>
-        <button
-          className="footer-button"
-          onClick={() => handleCategoryClick("Learning")}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            fill="currentColor"
-            viewBox="0 0 16 16"
-          >
-            <path d="M8 3l6 6-6 6-6-6 6-6zM8 1L1 8l7 7 7-7L8 1z" />
-          </svg>
-          Learning
-        </button>
-        <button
-          className="footer-button"
-          onClick={() => handleCategoryClick("Health")}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            fill="currentColor"
-            viewBox="0 0 16 16"
-          >
-            <path d="M8 4a4 4 0 1 1 0 8 4 4 0 0 1 0-8zM8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM8 7a1 1 0 1 1-1-1 1 1 0 0 1 1 1z" />
-          </svg>
-          Health
-        </button>
+            {cat}
+          </button>
+        ))}
       </div>
       {showOptions && (
         <div className="options-modal">
           <h4>Select an option for {showOptions}</h4>
-          {showOptions === "Learning" && (
-            <div className="learning-options">
-              <button onClick={() => handleOptionSelect("Books")}>Books</button>
-              <button onClick={() => handleOptionSelect("Courses")}>Courses</button>
-              <button onClick={() => handleOptionSelect("Tutorials")}>Tutorials</button>
-            </div>
-          )}
-          {showOptions === "Health" && (
-            <div className="health-options">
-              <button onClick={() => handleOptionSelect("Exercise")}>Exercise</button>
-              <button onClick={() => handleOptionSelect("Diet")}>Diet</button>
-              <button onClick={() => handleOptionSelect("Meditation")}>Meditation</button>
-            </div>
-          )}
-          {showOptions === "Errands" && (
-            <div className="errands-options">
-              <button onClick={() => handleOptionSelect("Shopping")}>Shopping</button>
-              <button onClick={() => handleOptionSelect("Pay Bills")}>Pay Bills</button>
-              <button onClick={() => handleOptionSelect("Grocery")}>Grocery</button>
-            </div>
-          )}
-          {showOptions === "Cleaning" && (
-            <div className="cleaning-options">
-              <button onClick={() => handleOptionSelect("Vacuum")}>Vacuum</button>
-              <button onClick={() => handleOptionSelect("Dusting")}>Dusting</button>
-              <button onClick={() => handleOptionSelect("Organizing")}>Organizing</button>
-            </div>
-          )}
+          {["Option 1", "Option 2", "Option 3"].map((opt) => (
+            <button key={opt} onClick={() => handleOptionSelect(opt)}>
+              {opt}
+            </button>
+          ))}
           <button onClick={() => setShowOptions("")}>Close</button>
         </div>
       )}
