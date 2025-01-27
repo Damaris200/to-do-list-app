@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  useRef,
-  useMemo,
-  useCallback,
-  useEffect,
-} from "react";
+import { useState, useRef, useMemo, useCallback, useEffect } from "react";
 import AddTask from "./components/AddTask";
 
 const App = () => {
@@ -23,28 +17,29 @@ const App = () => {
   // Automatically focus the task input field
   useEffect(() => {
     inputRef.current?.focus();
-  }, [taskName]);
+    console.log(category);
+  }, [category, taskName]);
 
   // Log task changes for debugging
   useEffect(() => {
     console.log("Tasks updated:", tasks);
   }, [tasks]);
 
-  const addTask = useCallback(
-    (task) => {
-      const taskName = task.taskName;
-      const category = task.category;
-      if (taskName && category) {
-        setTasks((prevTasks) => [
-          ...prevTasks,
-          { id: prevTasks.length + 1, task: taskName.trim(), completed: false, category },
-        ]);
-      } else {
-        alert("Please provide a valid task name and category.");
-      }
-    },
-    [] 
-  );
+  const addTask = useCallback((task) => {
+    if (task.text && task.category) {
+      setTasks((prevTasks) => [
+        ...prevTasks,
+        {
+          id: prevTasks.length + 1,
+          task: task.text.trim(),
+          completed: false,
+          category: task.category,
+        },
+      ]);
+    } else {
+      alert("Please provide a valid task name and category.");
+    }
+  }, []);
 
   const deleteTask = useCallback((id) => {
     setTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
@@ -105,6 +100,7 @@ const App = () => {
                 type="search"
                 name="search-tasks"
                 placeholder="Search Tasks"
+                style={{borderRadius: '10px', border: 'none', marginBottom: '1em', width: '20em', paddingBlock: '0.5em'}}
               />
             </div>
             <div className="task-list">
@@ -137,7 +133,7 @@ const App = () => {
         {/* Right Section */}
         <div className="right-section">
           <div className="frame">
-            <h3 className="section-title">Today's Progress</h3>
+            <h3 className="section-title">Today&apos;s Progress</h3>
             <div className="progress">
               <div className="progress-bar">
                 <div

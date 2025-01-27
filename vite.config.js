@@ -7,8 +7,8 @@ export default defineConfig({
     plugins: [react()],
     resolve: {
         alias: {
-            '~': path.resolve(__dirname, 'node_modules'),
+            '~': path.resolve(path.dirname(new URL(import.meta.url).pathname), 'node_modules'),
         },
     },
-    base: "/todo-list"
+    base: "/",
 })
